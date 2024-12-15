@@ -100,4 +100,13 @@ export type linkData = {
     icon: React.ForwardRefExoticComponent<Omit<SVGProps<SVGSVGElement>, "ref">>;
 };
 
+export type State = {
+    errors?: {
+        customerId?: string[];
+        amount?: string[];
+        status?: string[];
+    };
+    message?: string | null;
+};
+
 export type CustomerStatus = "inactive" | "active";
