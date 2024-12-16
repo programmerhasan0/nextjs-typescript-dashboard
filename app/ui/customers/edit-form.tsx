@@ -11,10 +11,10 @@ import {
 } from "@heroicons/react/24/outline";
 import { Button } from "@/app/ui/button";
 import { addCustomer } from "@/app/lib/actions";
-import type { State } from "@/app/lib/definitions";
+import type { State, CustomerForm } from "@/app/lib/definitions";
 import { useActionState } from "react";
 
-const AddForm: React.FC = () => {
+const EditForm: React.FC<{ customer: CustomerForm }> = ({ customer }) => {
     const initialState: State = { message: null, errors: {} };
     const [state, formAction] = useActionState(addCustomer, initialState);
 
@@ -39,6 +39,7 @@ const AddForm: React.FC = () => {
                                 placeholder="Enter full Name"
                                 className="peer block w-full rounded-md border border-gray-200 py-2 pl-10 text-sm outline-2 placeholder:text-gray-500"
                                 aria-describedby="name-error"
+                                defaultValue={customer.name}
                             />
                             <UserCircleIcon className="pointer-events-none absolute left-3 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-gray-500 peer-focus:text-gray-900" />
                         </div>
@@ -78,6 +79,7 @@ const AddForm: React.FC = () => {
                                 placeholder="Enter email"
                                 className="peer block w-full rounded-md border border-gray-200 py-2 pl-10 text-sm outline-2 placeholder:text-gray-500"
                                 aria-describedby="email-error"
+                                defaultValue={customer.email}
                             />
                             <AtSymbolIcon className="pointer-events-none absolute left-3 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-gray-500 peer-focus:text-gray-900" />
                         </div>
@@ -117,6 +119,7 @@ const AddForm: React.FC = () => {
                                 placeholder="Enter phone number"
                                 className="peer block w-full rounded-md border border-gray-200 py-2 pl-10 text-sm outline-2 placeholder:text-gray-500"
                                 aria-describedby="phone-error"
+                                defaultValue={customer.phone}
                             />
                             <PhoneIcon className="pointer-events-none absolute left-3 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-gray-500 peer-focus:text-gray-900" />
                         </div>
@@ -153,6 +156,9 @@ const AddForm: React.FC = () => {
                                     value="active"
                                     className="h-4 w-4 cursor-pointer border-gray-300 bg-gray-100 text-gray-600 focus:ring-2"
                                     aria-describedby="status-error"
+                                    defaultChecked={
+                                        customer.status === "active"
+                                    }
                                 />
                                 <label
                                     htmlFor="active"
@@ -169,6 +175,9 @@ const AddForm: React.FC = () => {
                                     value="inactive"
                                     className="h-4 w-4 cursor-pointer border-gray-300 bg-gray-100 text-gray-600 focus:ring-2"
                                     aria-describedby="status-error"
+                                    defaultChecked={
+                                        customer.status === "inactive"
+                                    }
                                 />
                                 <label
                                     htmlFor="inactive"
@@ -209,4 +218,4 @@ const AddForm: React.FC = () => {
     );
 };
 
-export default AddForm;
+export default EditForm;

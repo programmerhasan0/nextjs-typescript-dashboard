@@ -1,6 +1,6 @@
 import Image from "next/image";
 import type { CustomerField } from "@/app/lib/definitions";
-import { DeleteInvoice, UpdateInvoice } from "@/app/ui/invoices/buttons";
+import { DeleteCustomer, UpdateCustomer } from "@/app/ui/invoices/buttons";
 import CustomerStatus from "@/app/ui/customers/status";
 const CustomerTable: React.FC<{ customers: CustomerField[] }> = ({
     customers,
@@ -121,10 +121,10 @@ const CustomerTable: React.FC<{ customers: CustomerField[] }> = ({
                                         </td>
                                         <td className="whitespace-nowrap py-3 pl-6 pr-3">
                                             <div className="flex justify-end gap-3">
-                                                <UpdateInvoice
+                                                <UpdateCustomer
                                                     id={customer.id}
                                                 />
-                                                <DeleteInvoice
+                                                <DeleteCustomer
                                                     id={customer.id}
                                                 />
                                             </div>

@@ -100,28 +100,15 @@ export const authenticate = async (
     }
 };
 
+// Adding a customer
 export const addCustomer = async (prevState: State, formData: FormData) => {
-    console.log("Entering the function");
-
-    // const obj = {
-    //     name: formData.get("name"),
-    //     email: formData.get("email"),
-    //     phone: formData.get("phone"),
-    //     image_url: formData.get("image"),
-    //     status: formData.get("status"),
-    // };
-
-    // console.log(obj);
-
     const validatedFields = AddCustomer.safeParse({
         name: formData.get("name"),
         email: formData.get("email"),
         phone: formData.get("phone"),
-        image_url: formData.get("image"),
+        image_url: "/customers/avatar_female.png",
         status: formData.get("status"),
     });
-
-    console.log("logging after validation", validatedFields.data);
 
     if (!validatedFields.success) {
         return {
@@ -134,11 +121,20 @@ export const addCustomer = async (prevState: State, formData: FormData) => {
 
     try {
         await sql`INSERT INTO customers (name, email, image_url, status, phone) VALUES (${name}, ${email}, ${image_url}, ${status}, ${phone})`;
-        return { message: "Customer Added." };
     } catch (err) {
         return { message: "Database Error : Failed to add customers" };
     }
-
     revalidatePath("/dashboard/customers");
     redirect("/dashboard/customers");
+};
+
+// Deleting a customer
+export const deleteCustomerWithId = async (id: string) => {
+    try {
+        await sql`DELETE FROM customers WHERE id=${id}`;
+        revalidatePath("/dashboard/customers");
+        return { message: "Customer Deleted" };
+    } catch (err) {
+        return { message: "Database Error : Failed to Delete Customer" };
+    }
 };

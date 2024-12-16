@@ -109,4 +109,12 @@ export type State = {
     message?: string | null;
 };
 
+export type CustomerForm = {
+    id: string;
+    name: string;
+    email: string;
+    status: "active" | "inactive";
+    phone: string;
+};
+
 export type CustomerStatus = "inactive" | "active";
