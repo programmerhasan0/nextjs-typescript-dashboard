@@ -23,6 +23,13 @@ const CustomerSchema = z.object({
     phone: z.string(),
 });
 
+// Invoices
 export const CreateInvoice = FormSchema.omit({ id: true, date: true });
 export const UpdateInvoice = FormSchema.omit({ id: true, date: true });
+
+// Customer Services
 export const AddCustomer = CustomerSchema.omit({ id: true });
+export const UpdateCustomer = CustomerSchema.omit({
+    id: true,
+    image_url: true,
+});

@@ -19,11 +19,11 @@ const Page: React.FC<{}> = async () => {
                     <h1 className={`${lusitana.className} text-2xl`}>
                         Customers
                     </h1>
-                </div>
+            </div>
                 <div className="mt-4 flex items-center flex-row-reverse justify-between gap-2 md:mt-8">
                     <AddCustomer />
                 </div>
-                <Suspense>
+                <Suspense fallback="loading....">
                     <CustomerTable customers={customers} />
                 </Suspense>
             </div>

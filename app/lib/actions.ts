@@ -4,7 +4,13 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { signIn } from "@/auth";
 import { AuthError } from "next-auth";
-import { CreateInvoice, UpdateInvoice, AddCustomer } from "@/app/lib/zodSchema";
+import { transporter } from "@/app/lib/email-transports";
+import {
+    CreateInvoice,
+    UpdateInvoice,
+    AddCustomer,
+    UpdateCustomer,
+} from "@/app/lib/zodSchema";
 import type { State } from "@/app/lib/definitions";
 
 // Create Invoice
@@ -29,6 +35,28 @@ export const createInvoice = async (prevSate: State, formData: FormData) => {
 
     try {
         await sql`INSERT INTO invoices (customer_id, amount, status, date) VALUES (${customerId}, ${amountInCents}, ${status}, ${date})`;
+        const { email: customerEmail, name } = (
+            await sql`SELECT * from customers WHERE id=${customerId}`
+        ).rows[0];
+
+        try {
+            const mail = await transporter.sendMail({
+                from: process.env.SMTP_FROM,
+                to: customerEmail,
+                subject: `Invoice of $${amount}`,
+                text: `Hello ${name},
+                
+                Acme Dashboard Owner has created a invoice of $${amount} by your name. Please contact to pay him.
+    
+                Thank you.
+                
+                `,
+            });
+
+            console.log(mail.messageId);
+        } catch (error) {
+            console.log(error);
+        }
     } catch (error) {
         return { message: "Database Error: Failed to Create Invoices" };
     }
@@ -124,6 +152,39 @@ export const addCustomer = async (prevState: State, formData: FormData) => {
     } catch (err) {
         return { message: "Database Error : Failed to add customers" };
     }
+    revalidatePath("/dashboard/customers");
+    redirect("/dashboard/customers");
+};
+
+// Updating a customers
+export const updateCustomer = async (
+    id: string,
+    prevState: State,
+    formData: FormData
+) => {
+    const validatedFields = UpdateCustomer.safeParse({
+        name: formData.get("name"),
+        email: formData.get("email"),
+        phone: formData.get("phone"),
+        status: formData.get("status"),
+    });
+
+    if (!validatedFields.success) {
+        return {
+            erros: validatedFields.error.flatten().fieldErrors,
+            message: "Missing Fields! Failed to edit customer",
+        };
+    }
+
+    const { name, email, phone, status } = validatedFields.data;
+
+    try {
+        await sql`UPDATE customers SET name = ${name}, email = ${email}, phone = ${phone}, status = ${status} WHERE id = ${id}`;
+    } catch (err) {
+        console.log(err);
+        throw new Error("Database Error : Failed to Edit Customer");
+    }
+
     revalidatePath("/dashboard/customers");
     redirect("/dashboard/customers");
 };

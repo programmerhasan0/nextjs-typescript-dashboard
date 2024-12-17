@@ -10,13 +10,17 @@ import {
     XMarkIcon,
 } from "@heroicons/react/24/outline";
 import { Button } from "@/app/ui/button";
-import { addCustomer } from "@/app/lib/actions";
+import { updateCustomer } from "@/app/lib/actions";
 import type { State, CustomerForm } from "@/app/lib/definitions";
 import { useActionState } from "react";
 
 const EditForm: React.FC<{ customer: CustomerForm }> = ({ customer }) => {
-    const initialState: State = { message: null, errors: {} };
-    const [state, formAction] = useActionState(addCustomer, initialState);
+    const initialValue: State | any = { errors: {}, message: null };
+    const bindUpdateCustomerWithId = updateCustomer.bind(null, customer.id);
+    const [state, formAction] = useActionState(
+        bindUpdateCustomerWithId,
+        initialValue
+    );
 
     return (
         <form action={formAction}>
@@ -212,7 +216,7 @@ const EditForm: React.FC<{ customer: CustomerForm }> = ({ customer }) => {
                 >
                     Cancel
                 </Link>
-                <Button type="submit">Add Customer</Button>
+                <Button type="submit">Edit Customer</Button>
             </div>
         </form>
     );
