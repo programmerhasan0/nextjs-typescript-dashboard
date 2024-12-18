@@ -15,7 +15,7 @@ import type { State } from "@/app/lib/definitions";
 import { useActionState } from "react";
 
 const AddForm: React.FC = () => {
-    const initialState: State = { message: null, errors: {} };
+    const initialState: State | any = { message: null, errors: {} };
     const [state, formAction] = useActionState(addCustomer, initialState);
 
     return (
