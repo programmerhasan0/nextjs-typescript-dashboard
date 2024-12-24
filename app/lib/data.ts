@@ -175,9 +175,7 @@ export async function fetchInvoiceById(id: string) {
 export async function fetchCustomers() {
     try {
         const data = await sql<CustomerField>`
-      SELECT
-        id,
-        name
+      SELECT *
       FROM customers
       ORDER BY name ASC
     `;
@@ -222,3 +220,14 @@ export async function fetchFilteredCustomers(query: string) {
         throw new Error("Failed to fetch customer table.");
     }
 }
+
+export const fetchCustomerById = async (id: string) => {
+    try {
+        const data =
+            await sql`SELECT id, name, email, status, phone FROM customers WHERE id=${id}`;
+        return data.rows[0];
+    } catch (err) {
+        console.log("Database Error : Failed to fetch Customer Data By Id");
+        throw new Error("Failed to fetch Customer Data By Id");
+    }
+};

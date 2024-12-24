@@ -81,6 +81,10 @@ export type FormattedCustomersTable = {
 export type CustomerField = {
     id: string;
     name: string;
+    email: string;
+    image_url: string;
+    status: "active" | "inactive";
+    phone: string;
 };
 
 export type InvoiceForm = {
@@ -95,3 +99,22 @@ export type linkData = {
     href: string;
     icon: React.ForwardRefExoticComponent<Omit<SVGProps<SVGSVGElement>, "ref">>;
 };
+
+export type State = {
+    errors?: {
+        customerId?: string[];
+        amount?: string[];
+        status?: string[];
+    };
+    message?: string | null;
+};
+
+export type CustomerForm = {
+    id: string;
+    name: string;
+    email: string;
+    status: "active" | "inactive";
+    phone: string;
+};
+
+export type CustomerStatus = "inactive" | "active";
