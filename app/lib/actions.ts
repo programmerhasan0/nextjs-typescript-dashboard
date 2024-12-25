@@ -34,26 +34,35 @@ export const createInvoice = async (prevSate: State, formData: FormData) => {
     const date = new Date().toISOString().split("T")[0];
 
     try {
-        await sql`INSERT INTO invoices (customer_id, amount, status, date) VALUES (${customerId}, ${amountInCents}, ${status}, ${date})`;
+        const data =
+            await sql`INSERT INTO invoices (customer_id, amount, status, date) VALUES (${customerId}, ${amountInCents}, ${status}, ${date}) RETURNING id`;
         const { email: customerEmail, name } = (
             await sql`SELECT * from customers WHERE id=${customerId}`
         ).rows[0];
-
+        console.log("returning data", data.rows);
         try {
-            const mail = await transporter.sendMail({
-                from: process.env.SMTP_FROM,
-                to: customerEmail,
-                subject: `Invoice of $${amount}`,
-                text: `Hello ${name},
-                
-                Acme Dashboard Owner has created a invoice of $${amount} by your name. Please contact to pay him.
-    
-                Thank you.
-                
-                `,
-            });
+            if (status !== "paid") {
+                const mail = await transporter.sendMail({
+                    from: process.env.SMTP_FROM,
+                    to: customerEmail,
+                    subject: `Invoice of $${amount}`,
+                    html: `
+                    <p>Hello ${name}</p>
+                    <p>Acme Dashboard owner has created a $${amount} invoice by your name</p>
+                    <br/>
+                    <br/>
+                    <p><a href="${process.env.LIVE_URL}/payment/${data.rows[0].id}">Click Here</a> to pay online or contact him to pay manually</p>
 
-            console.log(mail.messageId);
+                    <p>Regards,</p>
+                    <p>Administrator</p>
+                    <p>Acme Invoice Dashboard</p>
+                    
+
+                    `,
+                });
+
+                console.log(mail.messageId);
+            }
         } catch (error) {
             console.log(error);
         }
@@ -199,3 +208,14 @@ export const deleteCustomerWithId = async (id: string) => {
         return { message: "Database Error : Failed to Delete Customer" };
     }
 };
+
+// Making payment
+export const makePayment = async (id: string) => {
+    try {
+    } catch (error) {
+        console.log(error);
+        console.log("Database Error : Failed to fetch");
+    }
+};
+
+// Update payment status

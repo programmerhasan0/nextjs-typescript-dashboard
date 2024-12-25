@@ -231,3 +231,20 @@ export const fetchCustomerById = async (id: string) => {
         throw new Error("Failed to fetch Customer Data By Id");
     }
 };
+
+export const fetchInvoiceByIdWithCustomers = async (id: string) => {
+    try {
+        const data = await sql`SELECT * FROM invoices WHERE id = ${id}`;
+        const customer =
+            await sql`SELECT * FROM customers WHERE id = ${data.rows[0].customer_id}`;
+
+        return {
+            ...data.rows[0],
+            customer: customer.rows[0],
+        };  
+    } catch (error) {
+        console.log(error);
+        console.log("Database Error : Failed to fetch Invoice & Customer Data");
+        throw new Error("Failed to fetch Invoice & assoiciated Customer Data");
+    }
+};
