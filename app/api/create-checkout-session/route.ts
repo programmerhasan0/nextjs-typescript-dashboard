@@ -1,10 +1,10 @@
 import stripe from "@/app/lib/stripe";
 
-import { NextApiRequest, NextApiResponse } from "next";
+import { NextApiRequest } from "next";
 import { fetchInvoiceById } from "@/app/lib/data";
 import { InvoiceForm } from "@/app/lib/definitions";
 
-export async function POST(req: Request, res: NextApiResponse) {
+export async function POST(req: Request) {
     const body = await req.json();
     console.log(body);
 
