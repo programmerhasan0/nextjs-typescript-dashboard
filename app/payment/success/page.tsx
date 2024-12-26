@@ -1,10 +1,6 @@
 "use client";
 
-import { ArrowRightIcon } from "@heroicons/react/20/solid";
-import { Button } from "@/app/ui/button";
-import type { InvoiceWithCustomer } from "@/app/lib/definitions";
-import Image from "next/image";
-import { Suspense, useEffect, useState } from "react";
+import { Suspense, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 
 function PaymentForm() {

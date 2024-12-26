@@ -180,6 +180,8 @@ export async function fetchCustomers() {
       ORDER BY name ASC
     `;
 
+        console.log("Logging customer data", data);
+
         const customers = data.rows;
         return customers;
     } catch (err) {
@@ -241,7 +243,7 @@ export const fetchInvoiceByIdWithCustomers = async (id: string) => {
         return {
             ...data.rows[0],
             customer: customer.rows[0],
-        };  
+        };
     } catch (error) {
         console.log(error);
         console.log("Database Error : Failed to fetch Invoice & Customer Data");
