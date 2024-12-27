@@ -163,6 +163,7 @@ export const addCustomer = async (prevState: State, formData: FormData) => {
     }
     revalidatePath("/dashboard/customers");
     revalidatePath("/dashboard/invoices/create");
+    revalidatePath("/dashboard/invoices/[id]/edit");
     redirect("/dashboard/customers");
 };
 
@@ -196,6 +197,8 @@ export const updateCustomer = async (
     }
 
     revalidatePath("/dashboard/customers");
+    revalidatePath("/dashboard/invoices/create");
+    revalidatePath("/dashboard/invoices/[id]/edit");
     redirect("/dashboard/customers");
 };
 
@@ -204,19 +207,11 @@ export const deleteCustomerWithId = async (id: string) => {
     try {
         await sql`DELETE FROM customers WHERE id=${id}`;
         revalidatePath("/dashboard/customers");
+        revalidatePath("/dashboard/invoices");
+        revalidatePath("/dashboard/invoices/create");
+        revalidatePath("/dashboard/invoices/[id]/edit");
         return { message: "Customer Deleted" };
     } catch (err) {
         return { message: "Database Error : Failed to Delete Customer" };
     }
 };
-
-// Making payment
-export const makePayment = async (id: string) => {
-    try {
-    } catch (error) {
-        console.log(error);
-        console.log("Database Error : Failed to fetch");
-    }
-};
-
-// Update payment status
