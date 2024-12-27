@@ -162,6 +162,7 @@ export const addCustomer = async (prevState: State, formData: FormData) => {
         return { message: "Database Error : Failed to add customers" };
     }
     revalidatePath("/dashboard/customers");
+    revalidatePath("/dashboard/invoices/create");
     redirect("/dashboard/customers");
 };
 

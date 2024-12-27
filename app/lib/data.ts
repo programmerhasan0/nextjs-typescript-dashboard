@@ -8,7 +8,6 @@ import {
     Revenue,
 } from "./definitions";
 import { formatCurrency } from "./utils";
-import { revalidatePath } from "next/cache";
 
 export async function fetchRevenue() {
     try {
@@ -181,10 +180,7 @@ export async function fetchCustomers() {
       ORDER BY name ASC
     `;
 
-        console.log("Logging customer data", data);
-
         const customers = data.rows;
-        revalidatePath("/dashboard/invoices/create");
         return customers;
     } catch (err) {
         console.error("Database Error:", err);
