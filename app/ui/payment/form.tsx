@@ -4,7 +4,9 @@ import { ArrowRightIcon } from "@heroicons/react/20/solid";
 import { Button } from "@/app/ui/button";
 import type { InvoiceWithCustomer } from "@/app/lib/definitions";
 import Image from "next/image";
-import { useState } from "react";
+import { useActionState, useEffect, useState } from "react";
+import { generateStripeSession } from "@/app/lib/actions";
+import { stripeInstace } from "@/app/lib/stripe";
 
 export default function PaymentForm({
     invoiceData,
@@ -13,36 +15,28 @@ export default function PaymentForm({
 }) {
     const [loading, setLoading] = useState<boolean>(false);
 
-    const handleSubmit = async (e: Event | any) => {
-        e.preventDefault();
-        setLoading(true);
+    const generateStripeSessionWithId = generateStripeSession.bind(
+        null,
+        invoiceData.id
+    );
 
-        const res = await fetch("/api/create-checkout-session", {
-            method: "POST",
-            body: JSON.stringify({ id: invoiceData.id }),
-            headers: {
-                "Content-type": "application/json; charset=UTF-8",
-            },
-        });
+    const [state, formAction] = useActionState(
+        generateStripeSessionWithId,
+        null
+    );
 
-        const data = await res.json();
-
-        if (data.id) {
-            const stripe = await import("@stripe/stripe-js");
-            const stripeInstance = await stripe.loadStripe(
-                process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY!
-            );
-
-            if (stripeInstance) {
-                stripeInstance.redirectToCheckout({ sessionId: data.id });
-            }
-        } else {
-            alert("Error Creating Checkout Session");
+    useEffect(() => {
+        if (state?.status === 200 && state?.sessionId) {
+            stripeInstace?.redirectToCheckout({ sessionId: state.sessionId });
         }
-    };
+    }, [state]);
 
     return (
-        <form className="space-y-3" onSubmit={e => handleSubmit(e)}>
+        <form
+            className="space-y-3"
+            action={formAction}
+            onSubmit={() => setLoading(true)}
+        >
             <div className="flex-1 rounded-lg bg-gray-50 px-6 pb-4 pt-8">
                 <div className="w-full">
                     {" "}
@@ -58,7 +52,10 @@ export default function PaymentForm({
                         ${`${invoiceData.amount / 100}`}
                     </h1>
                 </div>
-                <Button className="mt-4 w-full" disabled={loading}>
+                <Button
+                    className={`mt-4 w-full ${loading && "cursor-not-allowed"}`}
+                    disabled={loading}
+                >
                     Pay Now{" "}
                     <ArrowRightIcon className="ml-auto h-5 w-5 text-gray-50" />
                 </Button>

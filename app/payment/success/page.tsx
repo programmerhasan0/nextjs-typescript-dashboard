@@ -1,25 +1,19 @@
 "use client";
 
-import { Suspense, useEffect } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
+import { confirmPayment } from "@/app/lib/actions";
 
-function PaymentForm() {
+// types
+type paymentType = "paid" | "not paid" | null;
+
+function PaymentSuccessPage() {
     const params = useSearchParams();
     const sessionId = params.get("session_id");
+    const [paymentStatus, setPaymentStatus] = useState<paymentType>(null);
 
     useEffect(() => {
-        const sessionDetails = async () => {
-            const res = await fetch(
-                `/api/confirm-payment?session_id=${sessionId}`
-            );
-            const data = await res.json();
-
-            if (data.success) {
-                console.log("Success");
-            }
-        };
-
-        sessionDetails();
+        confirmPayment(sessionId!).then(res => setPaymentStatus(res!));
     }, []);
 
     return (
@@ -27,7 +21,9 @@ function PaymentForm() {
             <div className="flex-1 rounded-lg bg-gray-50 px-6 pb-4 pt-8">
                 <div className="w-full">
                     <h1 className="mb-3 text-2xl text-center">
-                        <span>Payment Successful</span>
+                        <span className="text-green-700">
+                            Payment Successful
+                        </span>
                     </h1>
                     <p className="text-center">Thank you for paying</p>
                 </div>
@@ -36,10 +32,10 @@ function PaymentForm() {
     );
 }
 
-export default function PaymentFormWithSuspense() {
+export default function Page() {
     return (
         <Suspense>
-            <PaymentForm />
+            <PaymentSuccessPage />
         </Suspense>
     );
 }

@@ -11,7 +11,9 @@ import {
     AddCustomer,
     UpdateCustomer,
 } from "@/app/lib/zodSchema";
-import type { State } from "@/app/lib/definitions";
+import type { InvoiceForm, State } from "@/app/lib/definitions";
+import { fetchInvoiceById } from "./data";
+import stripe from "@/app/lib/stripe";
 
 // Create Invoice
 export const createInvoice = async (prevSate: State, formData: FormData) => {
@@ -213,5 +215,56 @@ export const deleteCustomerWithId = async (id: string) => {
         return { message: "Customer Deleted" };
     } catch (err) {
         return { message: "Database Error : Failed to Delete Customer" };
+    }
+};
+
+// Generate Payment session Id
+export const generateStripeSession = async (id: string) => {
+    const invoiceData: InvoiceForm = await fetchInvoiceById(id);
+
+    try {
+        const session = await stripe.checkout.sessions.create({
+            payment_method_types: ["card"],
+            line_items: [
+                {
+                    price_data: {
+                        currency: "usd",
+                        product_data: {
+                            name: "Invoice Bill",
+                        },
+                        unit_amount: invoiceData.amount * 100,
+                    },
+                    quantity: 1,
+                },
+            ],
+            metadata: { invoiceId: invoiceData.id },
+            success_url: `${process.env.LIVE_URL}/payment/success?session_id={CHECKOUT_SESSION_ID}`,
+            cancel_url: `${process.env.LIVE_URL}/payment/failed?session_id={CHECKOUT_SESSION_ID}`,
+            mode: "payment",
+        });
+
+        return { status: 200, sessionId: session.id };
+    } catch (error) {
+        console.log(error, "logging from generateStripeSession method");
+    }
+};
+
+// confirm payment
+export const confirmPayment = async (sessionId: string) => {
+    console.log("updated from server actions");
+
+    try {
+        const session = await stripe.checkout.sessions.retrieve(sessionId);
+
+        if (session.payment_status === "paid") {
+            const invoiceId = session.metadata?.invoiceId;
+            await sql`UPDATE invoices SET status = 'paid' WHERE id=${invoiceId}`;
+
+            return "paid";
+        } else {
+            return "not paid";
+        }
+    } catch (error) {
+        console.log(error);
     }
 };
