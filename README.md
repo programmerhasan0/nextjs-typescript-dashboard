@@ -1,2 +1,3 @@
-demo user : user@nextmail.com
+demo user : user@nextmail.com\
+
 demo pass : 123456
